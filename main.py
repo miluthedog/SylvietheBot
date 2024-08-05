@@ -82,7 +82,7 @@ async def remind(ctx):
   to_day = today.strftime("%d/%m")
   await ctx.send(f'Master, this is your plan for today ({to_day}):')
 
-  async for message in daily.history(limit=5):
+  async for message in daily.history(limit=7):
     message_date = message.created_at.astimezone(tz)
 
     if today.date() == message_date.date() and "~~" not in message.content:
@@ -100,7 +100,7 @@ async def cross(ctx, keyword: str):
   tz = pytz.timezone('Asia/Ho_Chi_Minh')
   today = datetime.datetime.now(tz=tz)
 
-  async for message in daily.history(limit=5):
+  async for message in daily.history(limit=7):
     message_date = message.created_at.astimezone(tz)
 
     if today.date() == message_date.date() and keyword.lower() in message.content.lower() and "~~" not in message.content:
@@ -155,7 +155,7 @@ async def extend(ctx):
   today = datetime.datetime.now(tz=tz)
   yesterday = today - datetime.timedelta(days=1)
 
-  async for message in daily.history(limit=10):
+  async for message in daily.history(limit=14):
     message_date = message.created_at.astimezone(tz)
 
     if yesterday.date() == message_date.date() and "-" not in message.content and "~~" not in message.content:
