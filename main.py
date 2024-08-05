@@ -30,13 +30,13 @@ allowed_users = [
 ]
 
 day_names = {
-  0: "Mon",
-  1: "Tue",
-  2: "Wed",
-  3: "Thu",
-  4: "Fri",
-  5: "Sat",
-  6: "Sun"
+  0: "Monday's",
+  1: "Tuesday's",
+  2: "Wednesday's",
+  3: "Thursday's",
+  4: "Friday's",
+  5: "Saturday's",
+  6: "Sunday's"
 }
 
 def is_allowed():
@@ -72,7 +72,7 @@ async def ping(interaction: discord.Interaction):
 # Section 2: Study tracker
 
 
-@client.hybrid_command(description="Sylvie remind your daily plan")
+@client.hybrid_command(description="Sylvie remind your daily plan") # sent today, not crossed
 async def remind(ctx):
   daily = client.get_channel(daily_id)
   found = False
@@ -82,10 +82,10 @@ async def remind(ctx):
   to_day = today.strftime("%d/%m")
   await ctx.send(f'Master, this is your plan for today ({to_day}):')
 
-  async for message in daily.history(limit=3):
+  async for message in daily.history(limit=5):
     message_date = message.created_at.astimezone(tz)
 
-    if today.date() == message_date.date():
+    if today.date() == message_date.date() and "~~" not in message.content:
       await ctx.send(message.content)
       found = True
 
@@ -93,11 +93,28 @@ async def remind(ctx):
     await ctx.send("You didn't make a plan for today, master")
     await ctx.send("Let's make one together")
 
+@client.hybrid_command(description="Sylvie cross completed plans") # sent today, contain keyword, not crossed
+@is_allowed()
+async def cross(ctx, keyword: str):
+  daily = client.get_channel(daily_id)
+  tz = pytz.timezone('Asia/Ho_Chi_Minh')
+  today = datetime.datetime.now(tz=tz)
+
+  async for message in daily.history(limit=5):
+    message_date = message.created_at.astimezone(tz)
+
+    if today.date() == message_date.date() and keyword.lower() in message.content.lower() and "~~" not in message.content:
+      await message.edit(content = f'~~{message.content}~~')
+      await ctx.send(f'Congrats on completing {keyword}, master')
+      return
+
+  await ctx.send(f'You do not have plan for {keyword} today, master')
+
 
 # Section 3: Study planner (access restricted)
 
 
-@client.hybrid_command(description="Sylvie remind your weekly plan and make daily plan with you")
+@client.hybrid_command(description="Sylvie remind your weekly plan") # contain this week
 @is_allowed()
 async def plan(ctx):
   weekly = client.get_channel(weekly_id)
@@ -113,7 +130,7 @@ async def plan(ctx):
 
   async for message in schedule.history(limit=8):
     if to_day in message.content:
-      modified_message = message.content[5:]
+      modified_message = message.content[2:]
       await daily.send(modified_message)
     elif "Routine" in message.content:
       modified_message = message.content[2:]
@@ -128,18 +145,24 @@ async def plan(ctx):
       await ctx.send(message.content) 
       await ctx.send("What should we do today, master?")
 
-      def check(respond):
-        return respond.author == ctx.author and respond.channel == ctx.channel
-      
-      try:
-        plan = await client.wait_for('message', check=check, timeout=60.0)
-        await daily.send(plan.content)
-      except asyncio.TimeoutError:
-        await ctx.send("Maybe later, master")
-
       return
 
-@client.hybrid_command(description="Sylvie make daily plan with you")
+@client.hybrid_command(description="Sylvie extend due for uncompleted plans") # sent yesterday, not routine/class, not crossed
+@is_allowed()
+async def extend(ctx):
+  daily = client.get_channel(daily_id)
+  tz = pytz.timezone('Asia/Ho_Chi_Minh')
+  today = datetime.datetime.now(tz=tz)
+  yesterday = today - datetime.timedelta(days=1)
+
+  async for message in daily.history(limit=10):
+    message_date = message.created_at.astimezone(tz)
+
+    if yesterday.date() == message_date.date() and "-" not in message.content and "~~" not in message.content:
+      await daily.send(message.content)
+      await ctx.send("Yes, master")
+
+@client.hybrid_command(description="Sylvie make daily plan with you") # same user, same channel
 @is_allowed()
 async def add(ctx):
   daily = client.get_channel(daily_id)
@@ -152,6 +175,7 @@ async def add(ctx):
   try:
     plan = await client.wait_for('message', check=check, timeout=60.0)
     await daily.send(plan.content)
+    await ctx.send("Yes, master")
   except asyncio.TimeoutError:
     await ctx.send("Maybe later, master")
 
@@ -159,7 +183,7 @@ async def add(ctx):
 # Section 4: Study documents finder
 
 
-@client.hybrid_command(description="Sylvie find your study docs")
+@client.hybrid_command(description="Sylvie find your study docs") # contain keyword (and start with #)
 async def docs(ctx,keyword: str):
   docs = client.get_channel(documents_id)
 
@@ -169,7 +193,7 @@ async def docs(ctx,keyword: str):
         await ctx.send(f'Here your docs for {keyword}, master')
         await ctx.send(message.content)
         return
-    
+
   await ctx.send(f'You do not have docs for {keyword}, master')
 
 
