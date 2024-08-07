@@ -93,8 +93,24 @@ async def remind(ctx):
     await ctx.send("You didn't make a plan for today, master")
     await ctx.send("Let's make one together")
 
-@client.hybrid_command(description="Sylvie cross completed plans")
-@is_allowed()
+@client.hybrid_command(description="Sylvie remind your classes today")
+async def classes(ctx):
+  schedule = client.get_channel(schedule_id)
+
+  tz = pytz.timezone('Asia/Ho_Chi_Minh')
+  today = datetime.datetime.now(tz=tz)
+  weekday = today.weekday()
+  to_day = day_names[weekday]
+
+  async for message in schedule.history(limit=8): # all messages in schedule
+    if to_day in message.content:
+      modified_message = message.content[2:]
+      await ctx.send("This is your classes for today, master")
+      await ctx.send(modified_message)
+      return
+
+@client.hybrid_command(description="Sylvie cross completed plans") 
+@is_allowed() # only me
 async def cross(ctx, keyword: str):
   daily = client.get_channel(daily_id)
   tz = pytz.timezone('Asia/Ho_Chi_Minh')
@@ -115,7 +131,7 @@ async def cross(ctx, keyword: str):
 #
 #
 @client.hybrid_command(description="Sylvie remind your weekly plan")
-@is_allowed()
+@is_allowed() # only me
 async def plan(ctx):
   weekly = client.get_channel(weekly_id)
   schedule = client.get_channel(schedule_id)
@@ -123,16 +139,11 @@ async def plan(ctx):
 
   tz = pytz.timezone('Asia/Ho_Chi_Minh')
   today = datetime.datetime.now(tz=tz)
-  weekday = today.weekday()
   monday = today - datetime.timedelta(days=today.weekday())
   sunday = monday + datetime.timedelta(days=6)
-  to_day = day_names[weekday]
 
-  async for message in schedule.history(limit=8): # all messages in schedule
-    if to_day in message.content:
-      modified_message = message.content[2:]
-      await daily.send(modified_message)
-    elif "Routine" in message.content:
+  async for message in schedule.history(limit=1): # routine = last message in schedule
+    if "Routine" in message.content:
       modified_message = message.content[2:]
       await daily.send(modified_message)
 
@@ -142,13 +153,11 @@ async def plan(ctx):
 
     if mon_day in message.content and sun_day in message.content: # contain this week
       await ctx.send("Here's your plan for this week:")
-      await ctx.send(message.content) 
-      await ctx.send("What should we do today, master?")
-
+      await ctx.send(message.content)
       return
 
 @client.hybrid_command(description="Sylvie extend due for uncompleted plans")
-@is_allowed()
+@is_allowed() # only me
 async def extend(ctx):
   daily = client.get_channel(daily_id)
   tz = pytz.timezone('Asia/Ho_Chi_Minh')
@@ -163,7 +172,7 @@ async def extend(ctx):
       await ctx.send("Yes, master")
 
 @client.hybrid_command(description="Sylvie make daily plan with you")
-@is_allowed()
+@is_allowed() # only me
 async def add(ctx):
   daily = client.get_channel(daily_id)
   
