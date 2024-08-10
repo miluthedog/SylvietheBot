@@ -185,10 +185,10 @@ async def plan(ctx):
         await daily.send(modified_message)
         routine = True
     
-    if routine:
-      await ctx.send("Routine added to your plan, master")
-    if not routine:
-      await ctx.send("There's no routine today, master")
+  if routine:
+    await ctx.send("Routine added to your plan, master")
+  if not routine:
+    await ctx.send("There's no routine today, master")
 
   async for message in weekly.history(limit=5): # 5 last messages in weekly
     mon_day = monday.strftime("%d/%m")
