@@ -10,11 +10,13 @@ intents.message_content = True
 intents.members = True
 
 client = commands.Bot(command_prefix = 'Sylvie ', intents=intents)
-#
-#
+
 # Section 0: IDs
-#
-#
+  # server, catagory and channel IDs
+  # onwer account IDs
+  # check if owner
+  # day_names
+
 server_id = 1116323597590474845
 
 documents_id = 1116329448535506944
@@ -29,6 +31,11 @@ allowed_users = [
   discord.Object(id=754703510360162425)  # Pha 2
 ]
 
+def is_allowed():
+  async def predicate(ctx):
+    return ctx.author.id in [user.id for user in allowed_users]
+  return commands.check(predicate)
+
 day_names = {
   0: "Monday",
   1: "Tuesday",
@@ -39,15 +46,12 @@ day_names = {
   6: "Sunday"
 }
 
-def is_allowed():
-  async def predicate(ctx):
-    return ctx.author.id in [user.id for user in allowed_users]
-  return commands.check(predicate)
-#
-#
 # Section 1: Default features
-#
-#
+  # on_ready
+  # on_member_join
+  # on_command_error
+  # /ping
+
 @client.event
 async def on_ready():
   await client.tree.sync()
@@ -67,11 +71,12 @@ async def on_command_error(ctx, error):
 @client.tree.command(description="Checks Sylvie's latency")
 async def ping(interaction: discord.Interaction):
   await interaction.response.send_message(f"Master, Sylvie's latency: {round(client.latency * 1000)}ms")
-#
-#
+
 # Section 2: Study tracker
-#
-#
+  # /remind
+  # /classes
+  # /cross
+
 @client.hybrid_command(description="Sylvie remind your daily plan")
 async def remind(ctx):
   daily = client.get_channel(daily_id)
@@ -125,11 +130,12 @@ async def cross(ctx, keyword: str):
       return
 
   await ctx.send(f'You do not have plan for {keyword} today, master')
-#
-#
+
 # Section 3: Study planner (access restricted)
-#
-#
+  # /plan
+  # /extend
+  # /add
+
 @client.hybrid_command(description="Sylvie remind your weekly plan")
 @is_allowed() # only me
 async def plan(ctx):
@@ -187,11 +193,10 @@ async def add(ctx):
     await ctx.send("Yes, master")
   except asyncio.TimeoutError:
     await ctx.send("Maybe later, master")
-#
-#
+
 # Section 4: Study documents finder
-#
-#
+  # /docs
+
 @client.hybrid_command(description="Sylvie find your study docs")
 async def docs(ctx,keyword: str):
   docs = client.get_channel(documents_id)
@@ -204,9 +209,7 @@ async def docs(ctx,keyword: str):
         return
 
   await ctx.send(f'You do not have docs for {keyword}, master')
-#
-#
+
 # PRIVATE KEY BELOW
-#
-#
+
 client.run('MTI2NTM2MzEzMjU0MTQ0MDEwMA.GalPSE._dHOdKaGNMHH29KR51ALrzf6VV0UXXBTg5rd3I')
