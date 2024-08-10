@@ -107,10 +107,27 @@ async def classes(ctx):
   weekday = today.weekday()
   to_day = day_names[weekday]
 
-  async for message in schedule.history(limit=8): # all messages in schedule
+  async for message in schedule.history(limit=10): # all messages in schedule
     if to_day in message.content:
       modified_message = message.content[2:]
       await ctx.send("This is your classes for today, master")
+      await ctx.send(modified_message)
+      return
+
+@client.hybrid_command(description="Sylvie remind your classes tomorrow")
+async def classestmr(ctx):
+  schedule = client.get_channel(schedule_id)
+
+  tz = pytz.timezone('Asia/Ho_Chi_Minh')
+  today = datetime.datetime.now(tz=tz)
+  tomorrow = today + datetime.timedelta(days=1)
+  weekday = tomorrow.weekday()
+  to_morrow = day_names[weekday]
+
+  async for message in schedule.history(limit=10): # all messages in schedule
+    if to_morrow in message.content:
+      modified_message = message.content[2:]
+      await ctx.send("This is your classes for tomorrow, master")
       await ctx.send(modified_message)
       return
 
@@ -125,8 +142,19 @@ async def cross(ctx, keyword: str):
     message_date = message.created_at.astimezone(tz)
 
     if today.date() == message_date.date() and keyword.lower() in message.content.lower() and "~~" not in message.content: # sent today, contain keyword, not crossed
-      await message.edit(content = f'~~{message.content}~~')
-      await ctx.send(f'Congrats on completing {keyword}, master')
+      await ctx.send("Can Sylvie ask what you did, master")
+
+      def check(respond):
+        return respond.author == ctx.author and respond.channel == ctx.channel # same user, same channel
+
+      try:
+        context = await client.wait_for('message', check=check, timeout=60.0)
+        await message.edit(content = f'~~{message.content}~~: {context.content}')
+        await ctx.send(f'Congrats on completing {keyword}, master')
+      except asyncio.TimeoutError:
+        await message.edit(content = f'~~{message.content}~~')
+        await ctx.send("Yes, congrats master for doing good work")
+      
       return
 
   await ctx.send(f'You do not have plan for {keyword} today, master')
@@ -148,10 +176,19 @@ async def plan(ctx):
   monday = today - datetime.timedelta(days=today.weekday())
   sunday = monday + datetime.timedelta(days=6)
 
-  async for message in schedule.history(limit=1): # routine = last message in schedule
+  async for message in schedule.history(limit=3): # routine = last message in schedule
+    routine = False
+
     if "Routine" in message.content:
-      modified_message = message.content[2:]
-      await daily.send(modified_message)
+      modified_message = message.content[11:]
+      if modified_message:
+        await daily.send(modified_message)
+        routine = True
+    
+    if routine:
+      await ctx.send("Routine added to your plan, master")
+    if not routine:
+      await ctx.send("There's no routine today, master")
 
   async for message in weekly.history(limit=5): # 5 last messages in weekly
     mon_day = monday.strftime("%d/%m")
@@ -179,20 +216,11 @@ async def extend(ctx):
 
 @client.hybrid_command(description="Sylvie make daily plan with you")
 @is_allowed() # only me
-async def add(ctx):
+async def add(ctx, keyword: str):
   daily = client.get_channel(daily_id)
   
-  await ctx.send("What else should we do today, master?")
-
-  def check(respond):
-    return respond.author == ctx.author and respond.channel == ctx.channel # same user, same channel
-      
-  try:
-    plan = await client.wait_for('message', check=check, timeout=60.0)
-    await daily.send(plan.content)
-    await ctx.send("Yes, master")
-  except asyncio.TimeoutError:
-    await ctx.send("Maybe later, master")
+  await daily.send(keyword)
+  await ctx.send("Yes, master")
 
 # Section 4: Study documents finder
   # /docs
