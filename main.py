@@ -206,13 +206,19 @@ async def extend(ctx):
   tz = pytz.timezone('Asia/Ho_Chi_Minh')
   today = datetime.datetime.now(tz=tz)
   yesterday = today - datetime.timedelta(days=1)
+  extended = False
 
   async for message in daily.history(limit=14):
     message_date = message.created_at.astimezone(tz)
 
     if yesterday.date() == message_date.date() and "-" not in message.content and "~~" not in message.content: # sent yesterday, not routine/class, not crossed
       await daily.send(message.content)
-      await ctx.send("Yes, master")
+      extended = True
+    
+  if extended:
+    await ctx.send("Yes, master")
+  if not extended:
+    await ctx.send("You finished all yesterday's work, master")
 
 @client.hybrid_command(description="Sylvie make daily plan with you")
 @is_allowed() # only me
