@@ -66,36 +66,33 @@ class tracker(commands.Cog):
     async def plan(self, ctx):
         schedule = self.sylvie.get_channel(config.schedule_id)
         weekly = self.sylvie.get_channel(config.weekly_id)
-        daily = self.sylvie.get_channel(config.daily_id)
 
         tz = pytz.timezone('Asia/Ho_Chi_Minh')
         today = datetime.datetime.now(tz = tz)
-        yesterday = today - datetime.timedelta(days = 1)
         monday = today - datetime.timedelta(days=today.weekday())
         sunday = monday + datetime.timedelta(days = 6)
 
+        embed = discord.Embed(
+            color = discord.Color.red(),
+            title = ":pencil: Sylvie's planner",
+        )
+        embed.set_footer(text = "-from Sylvie with love-")
+
         async for message in schedule.history(limit = 1):
             if "Routine" in message.content:
-                modified_message = message.content[15:]
+                modified_message = message.content[9:]
                 if modified_message:
-                    await ctx.send("This's your daily routine, master")
-                    await ctx.send(modified_message)
+                    embed.add_field(name = "Daily Routine", value = modified_message)
                 elif not modified_message:
-                    await ctx.send("There's no routine today, master")
-        
-        async for message in daily.history(limit=20):
-            message_date = message.created_at.astimezone(tz)
-
-            if yesterday.date() == message_date.date() and "-" not in message.content and "~~" not in message.content: # sent yesterday, not routine/class, not crossed
-                await ctx.send(message.content)
+                    embed.add_field(name = "Daily Routine", value = "none")
 
         async for message in weekly.history(limit = 5):
             mon_day = monday.strftime("%d/%m")
             sun_day = sunday.strftime("%d/%m")
 
             if mon_day in message.content and sun_day in message.content:
-                await ctx.send("Here's your plan for this week:")
-                await ctx.send(message.content)
+                embed.insert_field_at(0, name = "Weekly plan", value = message.content[15:])
+                await ctx.send(embed = embed)
                 return
 
 async def setup(sylvie):
