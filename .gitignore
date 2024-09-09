@@ -1,0 +1,4 @@
+# temporary file
+*.pyc
+# secret data
+.env
