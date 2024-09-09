@@ -11,7 +11,7 @@ main.py
     planner.py
         /add
         /cross
-    tracker.py
+    reminder.py
         /remind
         /classes
         /classestmr

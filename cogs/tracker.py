@@ -4,7 +4,7 @@ import datetime
 import pytz
 import cogs.config as config
 
-class tracker(commands.Cog):    
+class reminder(commands.Cog):    
     def __init__(self, sylvie):
         self.sylvie = sylvie
 
@@ -96,4 +96,4 @@ class tracker(commands.Cog):
                 return
 
 async def setup(sylvie):
-    await sylvie.add_cog(tracker(sylvie))
+    await sylvie.add_cog(reminder(sylvie))
