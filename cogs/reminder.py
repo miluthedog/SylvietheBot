@@ -14,18 +14,18 @@ class reminder(commands.Cog):
         daily = self.sylvie.get_channel(config.daily_id)
         tz = pytz.timezone('Asia/Ho_Chi_Minh')
         today = datetime.datetime.now(tz=tz)
-        found = False
-
         to_day = today.strftime("%d/%m")
+
+        found = False
+        messages = ""
 
         async for message in daily.history(limit = 10):
             message_date = message.created_at.astimezone(tz)
-            messages = []
             if today.date() == message_date.date() and "~~" not in message.content: # sent today, not crossed
-                messages = messages +"\n"+ message.content
+                messages = f"{messages}\n{message.content}"
                 found = True
         if found:
-            await ctx.send(f"Master, this is your plan for today ({to_day}):\n{messages}")
+            await ctx.send(f"Master, this is your plan for today ({to_day}):{messages}")
         else:
             await ctx.send("Congrats, master! There are no plan left for today.")
 
