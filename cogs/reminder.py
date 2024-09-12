@@ -12,27 +12,26 @@ class reminder(commands.Cog):
     @commands.hybrid_command(description="Sylvie remind your daily plan")
     async def remind(self, ctx):
         daily = self.sylvie.get_channel(config.daily_id)
-        found = False
         tz = pytz.timezone('Asia/Ho_Chi_Minh')
         today = datetime.datetime.now(tz=tz)
+        found = False
 
         to_day = today.strftime("%d/%m")
-        await ctx.send(f'Master, this is your plan for today ({to_day}):')
 
         async for message in daily.history(limit = 10):
             message_date = message.created_at.astimezone(tz)
-
+            messages = []
             if today.date() == message_date.date() and "~~" not in message.content: # sent today, not crossed
-                await ctx.send(message.content)
+                messages = messages +"\n"+ message.content
                 found = True
-
-        if not found:
-            await ctx.send("...")
+        if found:
+            await ctx.send(f"Master, this is your plan for today ({to_day}):\n{messages}")
+        else:
             await ctx.send("Congrats, master! There are no plan left for today.")
 
 
 
-    @commands.hybrid_command(description="Sylvie remind your classes tomorrow")
+    @commands.hybrid_command(description="Sylvie remind your classes")
     async def classes(self, ctx, day: Literal["tomorrow", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] = None):
         schedule = self.sylvie.get_channel(config.schedule_id)
 
@@ -47,18 +46,18 @@ class reminder(commands.Cog):
         if day is None:
             async for message in schedule.history(limit = 8):
                 if to_day in message.content:
-                    await ctx.send(f"This is your classes for today, master\n{message.content[2:]}")
+                    await ctx.send(f"These are your classes for today, master:\n{message.content[2:]}")
                     return
         else:
             if day == "tomorrow":
                 async for message in schedule.history(limit = 8):
                     if to_morrow in message.content:
-                        await ctx.send(f"This is your classes for {day}, master\n{message.content[2:]}")
+                        await ctx.send(f"These are your classes for {day}, master:\n{message.content[2:]}")
                         return
             else:
                 async for message in schedule.history(limit = 8):
                     if day in message.content:
-                        await ctx.send(f"This is your classes for {day}, master\n{message.content[2:]}")
+                        await ctx.send(f"These are your classes for {day}, master:\n{message.content[2:]}")
                         return
 
 
