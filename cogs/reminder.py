@@ -22,7 +22,7 @@ class reminder(commands.Cog):
         async for message in daily.history(limit = 10):
             message_date = message.created_at.astimezone(tz)
             if today.date() == message_date.date() and "~~" not in message.content: # sent today, not crossed
-                messages = f"{messages}\n{message.content}"
+                messages = f"{messages}\n- {message.content}"
                 found = True
         if found:
             await ctx.send(f"Master, this is your plan for today ({to_day}):{messages}")
