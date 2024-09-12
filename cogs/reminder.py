@@ -29,8 +29,6 @@ class reminder(commands.Cog):
         else:
             await ctx.send("Congrats, master! There are no plan left for today.")
 
-
-
     @commands.hybrid_command(description="Sylvie remind your classes")
     async def classes(self, ctx, day: Literal["tomorrow", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] = None):
         schedule = self.sylvie.get_channel(config.schedule_id)
@@ -59,8 +57,6 @@ class reminder(commands.Cog):
                     if day in message.content:
                         await ctx.send(f"These are your classes for {day}, master:\n{message.content[2:]}")
                         return
-
-
 
     @commands.hybrid_command(description="Sylvie remind your weekly plan")
     async def plan(self, ctx):
