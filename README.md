@@ -14,5 +14,4 @@ main.py
     reminder.py
         /remind
         /classes
-        /classestmr
         /plan

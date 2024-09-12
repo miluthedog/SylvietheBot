@@ -22,6 +22,8 @@ class planner(commands.Cog):
         await daily.send(keyword)
         await ctx.send("Yes, master")
 
+
+
     @commands.hybrid_command(description="Sylvie cross completed plans") 
     @is_allowed()
     async def cross(self, ctx, keyword: str):

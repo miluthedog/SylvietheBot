@@ -3,6 +3,7 @@ from discord.ext import commands
 import datetime
 import pytz
 import cogs.config as config
+from typing import Literal
 
 class reminder(commands.Cog):    
     def __init__(self, sylvie):
@@ -28,40 +29,40 @@ class reminder(commands.Cog):
         if not found:
             await ctx.send("...")
             await ctx.send("Congrats, master! There are no plan left for today.")
-    
-    @commands.hybrid_command(description="Sylvie remind your classes today")
-    async def classes(self, ctx):
-        schedule = self.sylvie.get_channel(config.schedule_id)
 
-        tz = pytz.timezone('Asia/Ho_Chi_Minh')
-        today = datetime.datetime.now(tz = tz)
-        weekday = today.weekday()
-        to_day = config.day_names[weekday]
 
-        async for message in schedule.history(limit = 10):
-            if to_day in message.content:
-                modified_message = message.content[2:]
-                await ctx.send("This is your classes for today, master")
-                await ctx.send(modified_message)
-                return
-    
+
     @commands.hybrid_command(description="Sylvie remind your classes tomorrow")
-    async def classestmr(self, ctx):
+    async def classes(self, ctx, day: Literal["tomorrow", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] = None):
         schedule = self.sylvie.get_channel(config.schedule_id)
 
         tz = pytz.timezone('Asia/Ho_Chi_Minh')
         today = datetime.datetime.now(tz = tz)
         tomorrow = today + datetime.timedelta(days = 1)
-        weekday = tomorrow.weekday()
-        to_morrow = config.day_names[weekday]
+        to_weekday = today.weekday()
+        to_morweekday = tomorrow.weekday()
+        to_day = config.day_names[to_weekday]
+        to_morrow = config.day_names[to_morweekday]
 
-        async for message in schedule.history(limit = 10):
-            if to_morrow in message.content:
-                modified_message = message.content[2:]
-                await ctx.send("This is your classes for tomorrow, master")
-                await ctx.send(modified_message)
-                return
-    
+        if day is None:
+            async for message in schedule.history(limit = 8):
+                if to_day in message.content:
+                    await ctx.send(f"This is your classes for today, master\n{message.content[2:]}")
+                    return
+        else:
+            if day == "tomorrow":
+                async for message in schedule.history(limit = 8):
+                    if to_morrow in message.content:
+                        await ctx.send(f"This is your classes for {day}, master\n{message.content[2:]}")
+                        return
+            else:
+                async for message in schedule.history(limit = 8):
+                    if day in message.content:
+                        await ctx.send(f"This is your classes for {day}, master\n{message.content[2:]}")
+                        return
+
+
+
     @commands.hybrid_command(description="Sylvie remind your weekly plan")
     async def plan(self, ctx):
         schedule = self.sylvie.get_channel(config.schedule_id)

@@ -17,7 +17,9 @@ class finder(commands.Cog):
                 
                 return
         await ctx.send(f'You do not have docs for {keyword}, master')
-    
+
+
+
     @commands.hybrid_command(description="Sylvie find your HUST docs")
     async def docshust(self, ctx, keyword: str):
         docs = self.sylvie.get_channel(config.hustdocs)
