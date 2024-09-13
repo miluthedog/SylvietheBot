@@ -42,31 +42,32 @@ class reminder(commands.Cog):
         to_morrow = config.day_names[to_morweekday]
 
         if day is None:
-            async for message in schedule.history(limit = 8):
+            async for message in schedule.history(limit = 7):
                 if to_day in message.content:
                     await ctx.send(f"These are your classes for today, master:\n{message.content[2:]}")
                     return
         else:
             if day == "tomorrow":
-                async for message in schedule.history(limit = 8):
+                async for message in schedule.history(limit = 7):
                     if to_morrow in message.content:
                         await ctx.send(f"These are your classes for {day}, master:\n{message.content[2:]}")
                         return
             else:
-                async for message in schedule.history(limit = 8):
+                async for message in schedule.history(limit = 7):
                     if day in message.content:
                         await ctx.send(f"These are your classes for {day}, master:\n{message.content[2:]}")
                         return
 
     @commands.hybrid_command(description="Sylvie remind your weekly plan")
     async def plan(self, ctx):
-        schedule = self.sylvie.get_channel(config.schedule_id)
         weekly = self.sylvie.get_channel(config.weekly_id)
 
         tz = pytz.timezone('Asia/Ho_Chi_Minh')
         today = datetime.datetime.now(tz = tz)
         monday = today - datetime.timedelta(days=today.weekday())
         sunday = monday + datetime.timedelta(days = 6)
+        nextmonday = sunday + datetime.timedelta(days = 1)
+        nextsunday = nextmonday + datetime.timedelta(days = 6)
 
         embed = discord.Embed(
             color = discord.Color.red(),
@@ -74,20 +75,16 @@ class reminder(commands.Cog):
         )
         embed.set_footer(text = "-from Sylvie with love-")
 
-        async for message in schedule.history(limit = 1):
-            if "Routine" in message.content:
-                modified_message = message.content[9:]
-                if modified_message:
-                    embed.add_field(name = "Daily Routine", value = modified_message)
-                elif not modified_message:
-                    embed.add_field(name = "Daily Routine", value = "none")
+        mon_day = monday.strftime("%d/%m")
+        sun_day = sunday.strftime("%d/%m")
+        next_mon_day = nextmonday.strftime("%d/%m")
+        next_sun_day = nextsunday.strftime("%d/%m")
 
         async for message in weekly.history(limit = 5):
-            mon_day = monday.strftime("%d/%m")
-            sun_day = sunday.strftime("%d/%m")
-
-            if mon_day in message.content and sun_day in message.content:
-                embed.insert_field_at(0, name = "Weekly plan", value = message.content[15:])
+            if next_mon_day in message.content and next_sun_day in message.content:
+                embed.add_field(name = "Next week plan", value = message.content[15:])
+            elif mon_day in message.content and sun_day in message.content:
+                embed.insert_field_at(0, name = "This week plan", value = message.content[15:])
                 await ctx.send(embed = embed)
                 return
 
