@@ -9,11 +9,11 @@ class finder(commands.Cog):
     @commands.hybrid_command(description="Sylvie find your study docs")
     async def docs(self, ctx, name: str):
         docs = self.sylvie.get_channel(config.docs)
+        prefix = f"# {name.lower()}"
 
         async for message in docs.history():
-            if name.lower() in message.content.lower():
-                await ctx.send(f'Here your docs for {name}, master')
-                await ctx.send(message.content)
+            if prefix in message.content.lower():
+                await ctx.send(f'Here your docs for {name}, master\n{message.content}')
                 
                 return
         await ctx.send(f'You do not have docs for {name}, master')
@@ -21,11 +21,11 @@ class finder(commands.Cog):
     @commands.hybrid_command(description="Sylvie find your HUST docs")
     async def docshust(self, ctx, name: str):
         docs = self.sylvie.get_channel(config.hustdocs)
+        prefix = f"# {name.lower()}"
 
         async for message in docs.history():
-            if name.lower() in message.content.lower():
-                await ctx.send(f'Here your docs for {name}, master')
-                await ctx.send(message.content)
+            if prefix in message.content.lower():
+                await ctx.send(f'Here your docs for {name}, master\n{message.content}')
                 
                 return
         await ctx.send(f'You do not have docs for {name}, master')
