@@ -1,7 +1,9 @@
 # main.py
 Put your bot API key for TOKEN and run
 # cogs
+Commands and functionality
 ### config.py
+literally configs
 ### default.py
 - on_member_join
 - on_command_error
