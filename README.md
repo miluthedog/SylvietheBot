@@ -4,15 +4,15 @@ Put your bot API key for TOKEN and run
 Commands and functionality
 ### config.py
 ### default.py
-- on_member_join
-- on_command_error
+`- on_member_join`
+`- on_command_error`
 ### finder.py
-- /docs
-- /docshust
+`- /docs`
+`- /docshust`
 ### planner.py
-- /add
-- /cross
+`- /add`
+`- /cross`
 ### reminder.py
-- /remind
-- /classes
-- /plan
+`- /remind`
+`- /classes`
+`- /plan`
