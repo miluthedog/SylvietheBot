@@ -1,17 +1,17 @@
-# Sylvie's table of contents
-
-## main.py
-## config.py: literally config
-### default.py
+# main.py
+Put your bot API key for TOKEN and run
+# cogs
+**config.py:** literally config
+**default.py**
 - on_member_join
 - on_command_error
-### finder.py
+**finder.py**
 - /docs
 - /docshust
-### planner.py
+**planner.py**
 - /add
 - /cross
-### reminder.py
+**reminder.py**
 - /remind
 - /classes
 - /plan
