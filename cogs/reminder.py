@@ -8,28 +8,14 @@ from typing import Literal
 class reminder(commands.Cog):    
     def __init__(self, sylvie):
         self.sylvie = sylvie
-
-    @commands.hybrid_command(description="Sylvie remind your daily plan")
-    async def remind(self, ctx):
-        daily = self.sylvie.get_channel(config.daily_id)
-        tz = pytz.timezone('Asia/Ho_Chi_Minh')
-        today = datetime.datetime.now(tz=tz)
-        to_day = today.strftime("%d/%m")
-
-        found = False
-        messages = ""
-
-        async for message in daily.history(limit = 10):
-            message_date = message.created_at.astimezone(tz)
-            if today.date() == message_date.date() and "~~" not in message.content: # sent today, not crossed
-                messages = f"{messages}\n- {message.content}"
-                found = True
-        if found:
-            await ctx.send(f"Master, this is your plan for today ({to_day}):{messages}")
-        else:
-            await ctx.send("Congrats, master! There are no plan left for today.")
+    
+    def is_allowed():
+        async def predicate(ctx):
+            return ctx.author.id in config.allowed_users
+        return commands.check(predicate)
 
     @commands.hybrid_command(description="Sylvie remind your classes")
+    @is_allowed()
     async def classes(self, ctx, day: Literal["tomorrow", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] = None):
         schedule = self.sylvie.get_channel(config.schedule_id)
 
@@ -59,6 +45,7 @@ class reminder(commands.Cog):
                         return
 
     @commands.hybrid_command(description="Sylvie remind your weekly plan")
+    @is_allowed()
     async def plan(self, ctx):
         weekly = self.sylvie.get_channel(config.weekly_id)
 

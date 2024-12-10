@@ -1,4 +1,3 @@
-import discord
 from discord.ext import commands
 import cogs.config as config
 
