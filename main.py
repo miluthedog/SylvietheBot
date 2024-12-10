@@ -18,7 +18,8 @@ extension_list = [
 "cogs.default",
 "cogs.finder",
 "cogs.planner",
-"cogs.reminder"
+"cogs.reminder",
+"cogs.tracker"
 ]
 
 async def load():
