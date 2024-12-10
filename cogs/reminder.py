@@ -14,7 +14,7 @@ class reminder(commands.Cog):
             return ctx.author.id in config.allowed_users
         return commands.check(predicate)
 
-    @commands.hybrid_command(description="Sylvie remind your classes")
+    @commands.hybrid_command(description="[Pha only] Sylvie remind your classes")
     @is_allowed()
     async def classes(self, ctx, day: Literal["tomorrow", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] = None):
         schedule = self.sylvie.get_channel(config.schedule_id)
@@ -44,7 +44,7 @@ class reminder(commands.Cog):
                         await ctx.send(f"These are your classes for {day}, master:\n{message.content[2:]}")
                         return
 
-    @commands.hybrid_command(description="Sylvie remind your weekly plan")
+    @commands.hybrid_command(description="[Pha only] Sylvie remind your weekly plan")
     @is_allowed()
     async def plan(self, ctx):
         weekly = self.sylvie.get_channel(config.weekly_id)

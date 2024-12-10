@@ -83,7 +83,7 @@ class tracker(commands.Cog):
 
         connection.close()
 
-    @commands.hybrid_command(description="Weekly summarize")
+    @commands.hybrid_command(description="[Pha only] Weekly summarize")
     @is_allowed()
     async def summarize(self, ctx):
         connection = sql.connect("./cogs/tracker.db")
