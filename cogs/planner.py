@@ -57,7 +57,7 @@ class planner(commands.Cog):
             return
         
         task_list = "\n".join([task[0] for task in data])
-        await ctx.send(f"Your remaining tasks:\n{task_list}")
+        await ctx.send(f"Your remaining tasks:\n`{task_list}`")
 
         connection.close()
 
