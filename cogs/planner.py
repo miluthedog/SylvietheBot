@@ -56,8 +56,8 @@ class planner(commands.Cog):
             await ctx.send(f"You have no tasks left, {ctx.author.display_name}. {random_compliment}!")
             return
         
-        task_list = "\n".join([task[0] for task in data])
-        await ctx.send(f"Your remaining tasks:\n`{task_list}`")
+        task_list = "\n".join([f"- `{task[0]}`" for task in data])
+        await ctx.send(f"Your remaining tasks:\n{task_list}")
 
         connection.close()
 
