@@ -19,6 +19,7 @@ extension_list = [
 "cogs.finder",
 "cogs.planner",
 "cogs.reminder",
+"cogs.summarizer",
 "cogs.tracker"
 ]
 

@@ -96,7 +96,7 @@ class tracker(commands.Cog):
 
         if not data:
             random_compliment = random.choice(config.compliments)
-            await ctx.send(f"No one studied. {random_compliment}!")
+            await ctx.send(f"No one studied this week. {random_compliment}!")
             return
         
         embed = discord.Embed(
