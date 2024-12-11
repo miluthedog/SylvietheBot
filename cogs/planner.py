@@ -6,8 +6,9 @@ class planner(commands.Cog):
     def __init__(self, sylvie):
         self.sylvie = sylvie
 
-    @commands.hybrid_command(description="Sylvie find your study docs")
-    async def
+    @commands.hybrid_command(description="Add tasks")
+    async def add(self, task):
+
 
 
 async def setup(sylvie):

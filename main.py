@@ -17,7 +17,7 @@ async def on_ready():
 extension_list = [
 "cogs.default",
 "cogs.finder",
-"cogs.planner",
+#"cogs.planner",
 "cogs.reminder",
 "cogs.tracker"
 ]
