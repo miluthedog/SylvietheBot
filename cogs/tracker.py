@@ -40,14 +40,14 @@ class tracker(commands.Cog):
     async def on_voice_state_update(self, member, before, after):
         current_time = time.time()
         main = self.sylvie.get_channel(config.main_id)
+        voice = self.sylvie.get_channel(config.voice_id)
 
-        if not before.channel and after.channel: # join voice
+        if after.channel and after.channel.id == voice.id: # join voice
             start_time[member.id] = current_time
 
             await main.send(f"{member.display_name} is diving into their study session! Join them now: {after.channel.mention}")
 
-        
-        elif before.channel and not after.channel: # leave voice
+        if before.channel and before.channel.id == voice.id: # leave voice
             if member.id in start_time:
                 session = current_time - start_time.pop(member.id)
                 self.update_time(member.id, session)
