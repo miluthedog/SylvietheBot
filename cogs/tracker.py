@@ -42,11 +42,6 @@ class tracker(commands.Cog):
         main = self.sylvie.get_channel(config.main_id)
         voice = self.sylvie.get_channel(config.voice_id)
 
-        if after.channel and after.channel.id == voice.id: # join voice
-            start_time[member.id] = current_time
-
-            await main.send(f"{member.display_name} is diving into their study session! Join them now: {after.channel.mention}")
-
         if before.channel and before.channel.id == voice.id: # leave voice
             if member.id in start_time:
                 session = current_time - start_time.pop(member.id)
@@ -54,6 +49,11 @@ class tracker(commands.Cog):
 
                 random_compliment = random.choice(config.compliments)
                 await main.send(f"{member.display_name} just grinded for {session // 60} minutes straight. {random_compliment}!")
+
+        if after.channel and after.channel.id == voice.id: # join voice
+            start_time[member.id] = current_time
+
+            await main.send(f"{member.display_name} is diving into their study session! Join them now: {after.channel.mention}")
 
     @commands.hybrid_command(description="All-time leaderboard") # see all-time leaderboard
     async def leaderboard(self, ctx):
