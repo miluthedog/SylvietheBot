@@ -5,7 +5,8 @@ moduleList = [
 "module.docsFinder",
 "module.planReminder",
 "module.studyTracker",
-"module.tasksManager"
+"module.tasksManager",
+"module.textGenerator"
 ]
 
 class ID:
@@ -14,7 +15,7 @@ class ID:
 
     docs = 1249084987521630391
 
-    tasks = 1242448355116974211
+    tasks = 1148614907701514300
     notes = 1320012545800671232
 
     Pha = [
@@ -22,5 +23,7 @@ class ID:
         754703510360162425 # Pha con
     ]
 
-class API:
-    token = secret.TOKEN
+class token:
+    discord = secret.DISCORDTOKEN
+    hugging = secret.HUGGINGTOKEN
+    together = secret.TOGETHERTOKEN

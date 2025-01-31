@@ -11,10 +11,10 @@ async def loadModules():
         await sylvie.load_extension(module)
 
 async def SylvieOS():
-    token = config.API.token
+    APIkey = config.token.discord
     async with sylvie:
         await loadModules()
-        await sylvie.start(token)
+        await sylvie.start(APIkey)
 
 if __name__ == "__main__":
     asyncio.run(SylvieOS())
