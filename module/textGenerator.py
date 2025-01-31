@@ -21,7 +21,7 @@ class textGenerator(commands.Cog):
             print("Sylvie suddenly became DeepSeek")
             input = [{"role": "user", "content": message.content}]
             output = client.chat.completions.create(
-                model="deepseek-ai/DeepSeek-R1",
+                model="deepseek-ai/DeepSeek-V3",
                 messages=input,
                 max_tokens=250
                 )
