@@ -58,8 +58,8 @@ class studyTracker(commands.Cog):
         cursor.execute("SELECT user_id, all_time FROM time_database ORDER BY all_time DESC")
 
         embed = discord.Embed(
-            title = ":fire: __All-time leaderboard__ :fire:",
-            color = discord.Color.yellow()
+            color = discord.Color.yellow(),
+            title = ":fire: __All-time leaderboard__ :fire:"
         )
 
         data = cursor.fetchall()
@@ -74,7 +74,7 @@ class studyTracker(commands.Cog):
         embed.set_thumbnail(url=user.avatar.url)
         embed.set_footer(text = f"Your position: #{user_position}")
 
-        await ctx.send(embed=embed)
+        await ctx.send(embed = embed)
         database.close()
 
 
@@ -85,8 +85,8 @@ class studyTracker(commands.Cog):
         cursor.execute("SELECT user_id, weekly_time FROM time_database WHERE weekly_time > 0 ORDER BY weekly_time DESC")
         
         embed = discord.Embed(
-            title=":fire: __Weekly leaderboard__ :fire:",
-            color=discord.Color.yellow()
+            color=discord.Color.yellow(),
+            title=":fire: __Weekly leaderboard__ :fire:"
         )
 
         data = cursor.fetchall()
@@ -104,7 +104,7 @@ class studyTracker(commands.Cog):
         embed.set_thumbnail(url=user.avatar.url)
         embed.set_footer(text = f"Your position: #{user_position}")
 
-        await ctx.send(embed=embed)
+        await ctx.send(embed = embed)
         database.close()
 
 
@@ -116,8 +116,8 @@ class studyTracker(commands.Cog):
         cursor.execute("SELECT user_id, weekly_time FROM time_database WHERE weekly_time > 0 ORDER BY weekly_time DESC")
 
         embed = discord.Embed(
-            title=":fire: __Weekly leaderboard__ :fire:",
-            color=discord.Color.red()
+            color=discord.Color.red(),
+            title=":fire: __Weekly leaderboard__ :fire:"
         )
 
         data = cursor.fetchall()
@@ -136,7 +136,7 @@ class studyTracker(commands.Cog):
 
         cleartodolist()
         cursor.execute("UPDATE time_database SET weekly_time = 0")
-        await ctx.send(embed=embed)
+        await ctx.send(embed = embed)
         database.commit()
         database.close()
 

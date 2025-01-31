@@ -26,7 +26,7 @@ class planReminder(commands.Cog):
 
         embed = discord.Embed(
             color = discord.Color.red(),
-            title = ":pencil: Sylvie's planner",
+            title = ":pencil: Sylvie's planner"
         )
         embed.set_footer(text = f"-from {self.sylvie.user} with love-")
         async for message in notes.history(limit = 1):

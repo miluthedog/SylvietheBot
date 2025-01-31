@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 import sqlite3 as sql
 from module.checkpermission import checkPha
@@ -59,9 +60,19 @@ class tasksManager(commands.Cog):
         if not data:
             await ctx.send(f"You have no tasks left, {ctx.author.display_name}")
             return
-        
-        task_list = "\n".join([f"- `{task[0]}`" for task in data])
-        await ctx.send(f"Your remaining tasks:\n{task_list}")
+        number_of_tasks = len(data)
+        task_list = "\n".join(f"- {task[0]}" for task in data)    
+
+        embed = discord.Embed(
+            color = discord.Color.yellow(),
+            title = f":pencil: {ctx.author.display_name}'s todolist",
+            description = task_list
+        )
+        user = ctx.guild.get_member(ctx.author.id)
+        embed.set_thumbnail(url=user.avatar.url)
+        embed.set_footer(text = f"Tasks left: {number_of_tasks}")
+
+        await ctx.send(embed = embed)
         database.close()
 
 
