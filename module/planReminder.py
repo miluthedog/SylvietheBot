@@ -30,10 +30,10 @@ class planReminder(commands.Cog):
         )
         embed.set_footer(text = f"-from {self.sylvie.user} with love-")
         async for message in notes.history(limit = 1):
-            embed.add_field(name = "-Side note-", value = message.content)
+            embed.add_field(name = "- Side note -", value = message.content)
         async for message in tasks.history(limit = 10):
             if mondate in message.content and sundate in message.content:
-                embed.insert_field_at(0, name = "-This week plan-", value = message.content[15:])
+                embed.insert_field_at(0, name = "- This week plan -", value = message.content[15:])
                 await ctx.send(embed = embed)
                 return
 
