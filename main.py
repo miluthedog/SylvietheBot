@@ -1,35 +1,20 @@
 import discord
 from discord.ext import commands
-import os
 import asyncio
-from dotenv import load_dotenv
-
-load_dotenv()
-token = os.getenv('TOKEN')
+import config
 
 sylvie = commands.Bot(command_prefix = 'Sylvie ', intents = discord.Intents.all())
 
-@sylvie.event
-async def on_ready():
-    await sylvie.tree.sync()
-    print (f'{sylvie.user} is now ready, master!')
+async def loadModules():
+    modules = config.moduleList
+    for module in modules:
+        await sylvie.load_extension(module)
 
-extension_list = [
-"cogs.default",
-"cogs.finder",
-"cogs.planner",
-"cogs.reminder",
-"cogs.summarizer",
-"cogs.tracker"
-]
-
-async def load():
-    for extension in extension_list:
-        await sylvie.load_extension(extension)
-
-async def main():
+async def SylvieOS():
+    token = config.API.token
     async with sylvie:
-        await load()
+        await loadModules()
         await sylvie.start(token)
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(SylvieOS())

@@ -1,6 +1,6 @@
 # temporary files
 *\__pycache__
 
-# SECRET
-.env
+# important files
+secret.py
 *\.db
