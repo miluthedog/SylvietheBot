@@ -19,7 +19,7 @@ class textGenerator(commands.Cog):
 
         if "hey sylvie" in message.content.lower():
             print("Sylvie suddenly became DeepSeek")
-            input = [{"role": "user", "content": message.content}]
+            input = [{"role": "user", "content": f"DeepSeek{message.content[10:]}"}]
             output = client.chat.completions.create(
                 model="deepseek-ai/DeepSeek-V3",
                 messages=input,
