@@ -7,7 +7,6 @@ class autorespond(commands.Cog):
     def __init__(self, sylvie):
         self.sylvie = sylvie
 
-
     @commands.Cog.listener()
     async def on_ready(self):
         await self.sylvie.tree.sync()

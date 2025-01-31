@@ -8,7 +8,6 @@ database = sql.connect("./module/tasks.db")
 cursor = database.cursor()
 database.execute("CREATE TABLE IF NOT EXISTS todolist (user_id, task)")
 
-
 def cleartodolist():
     database = sql.connect("./module/tasks.db")
     cursor = database.cursor()
@@ -16,11 +15,9 @@ def cleartodolist():
     database.commit()
     database.close()
 
-
 class tasksManager(commands.Cog):
     def __init__(self, sylvie):
         self.sylvie = sylvie
-
 
     @commands.hybrid_command(description="Add task to your list") # add task to database
     async def add(self, ctx, task: str):

@@ -12,16 +12,11 @@ database = sql.connect("./module/studytime.db")
 cursor = database.cursor()
 database.execute("CREATE TABLE IF NOT EXISTS time_database (user_id, weekly_time, all_time)")
 
-# (summarize)
-
-
-start_time = {}
-
+start_time = {} # place holder for session start time
 
 class studyTracker(commands.Cog):
     def __init__(self, sylvie):
         self.sylvie = sylvie
-
 
     def update_time(self, user_id, session): # update time to database
         database = sql.connect("./module/studytime.db")

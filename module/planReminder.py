@@ -11,7 +11,6 @@ class planReminder(commands.Cog):
     def __init__(self, sylvie):
         self.sylvie = sylvie
 
-
     @commands.hybrid_command(description="[Pha only] Pha's weekly plan")
     @checkPha()
     async def plan(self, ctx):
