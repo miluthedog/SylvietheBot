@@ -1,6 +1,5 @@
-# temporary files
 *\__pycache__
-
-# important files
-secret.py
+*\.bat
 *\.db
+
+secret.py
