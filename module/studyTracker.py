@@ -19,7 +19,7 @@ class studyTracker(commands.Cog):
         
         self.update_time.start()
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(minutes=1)
     async def update_time(self):  # update time to database
         voice = self.sylvie.get_channel(config.ID.voice)
         if not voice:
@@ -32,11 +32,11 @@ class studyTracker(commands.Cog):
             data = cursor.fetchone()
             
             if data:
-                updated_time = data[1] + 10
-                all_time = data[2] + 10
+                updated_time = data[1] + 60
+                all_time = data[2] + 60
                 cursor.execute("UPDATE time_database SET weekly_time = ?, all_time = ? WHERE user_id = ?", (updated_time, all_time, member.id))
             else: 
-                cursor.execute("INSERT INTO time_database (user_id, weekly_time, all_time) VALUES (?, ?, ?)", (member.id, 10, 10))
+                cursor.execute("INSERT INTO time_database (user_id, weekly_time, all_time) VALUES (?, ?, ?)", (member.id, 60, 60))
         
         database.commit()
         database.close()
