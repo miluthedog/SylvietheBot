@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import sqlite3 as sql
 import time
 import config
@@ -12,27 +12,35 @@ database = sql.connect("./module/studytime.db")
 cursor = database.cursor()
 database.execute("CREATE TABLE IF NOT EXISTS time_database (user_id, weekly_time, all_time)")
 
-start_time = {} # place holder for session start time
-
 class studyTracker(commands.Cog):
     def __init__(self, sylvie):
         self.sylvie = sylvie
+        self.start_time = {}
+        
+        self.update_time.start()
 
-    def update_time(self, user_id, session): # update time to database
+    @tasks.loop(seconds=10)
+    async def update_time(self):  # update time to database
+        voice = self.sylvie.get_channel(config.ID.voice)
+        if not voice:
+            return
+
         database = sql.connect("./module/studytime.db")
         cursor = database.cursor()
-        cursor.execute("SELECT * from time_database WHERE user_id = ?", (user_id,))
-
-        data = cursor.fetchone()
-        if data:
-            updated_time = data[1] + session
-            all_time = data[2] + session
-            cursor.execute("UPDATE time_database SET weekly_time = ?, all_time = ? WHERE user_id = ?", (updated_time, all_time, user_id))
-        else: 
-            cursor.execute("INSERT INTO time_database (user_id, weekly_time, all_time) VALUES (?, ?, ?)", (user_id, session, session))
-
+        for member in voice.members:
+            cursor.execute("SELECT * FROM time_database WHERE user_id = ?", (member.id,))
+            data = cursor.fetchone()
+            
+            if data:
+                updated_time = data[1] + 10
+                all_time = data[2] + 10
+                cursor.execute("UPDATE time_database SET weekly_time = ?, all_time = ? WHERE user_id = ?", (updated_time, all_time, member.id))
+            else: 
+                cursor.execute("INSERT INTO time_database (user_id, weekly_time, all_time) VALUES (?, ?, ?)", (member.id, 10, 10))
+        
         database.commit()
         database.close()
+
 
     @commands.Cog.listener() # calculate study session time
     async def on_voice_state_update(self, member, before, after):
@@ -41,13 +49,12 @@ class studyTracker(commands.Cog):
         voice = self.sylvie.get_channel(config.ID.voice)
 
         if not before.channel and after.channel.id == voice.id: # join voice
-            start_time[member.id] = current_time
+            self.start_time[member.id] = current_time
             await main.send(f"{member.display_name} is diving into their study session! Join them now: {after.channel.mention}")
 
         if before.channel.id == voice.id and not after.channel: # leave voice
-            if member.id in start_time:
-                session = current_time - start_time.pop(member.id)
-                self.update_time(member.id, session)
+            if member.id in self.start_time:
+                session = current_time - self.start_time.pop(member.id)
                 await main.send(f"{member.display_name} just grinded for {session // 60} minutes straight")
 
 
