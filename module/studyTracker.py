@@ -30,6 +30,10 @@ class studyTracker(commands.Cog):
         database, cursor = self.connect_database()
         cursor.execute("CREATE TABLE IF NOT EXISTS time_database (user_id, weekly_time, all_time)")
         self.disconnect_database(database)
+    
+    
+    def format_time(self, time):
+        return f"{time // 3600} hours and {time % 3600 // 60} minutes"
 
 
     @tasks.loop(minutes=1) # every minute
@@ -64,90 +68,105 @@ class studyTracker(commands.Cog):
         if before.channel.id == voice.id and not after.channel: # leave voice
             if member.id in self.start_time:
                 session = current_time - self.start_time.pop(member.id)
-                await main.send(f"{member.display_name} just grinded for {session // 60} minutes straight")
+                await main.send(f"{member.display_name} just grinded for {self.format_time(session)} straight")
 
 
-    @commands.hybrid_command(description="All-time leaderboard") # see all-time leaderboard
-    async def leaderboard(self, ctx):
-        database, cursor = self.connect_database()
-        cursor.execute("SELECT user_id, all_time FROM time_database ORDER BY all_time DESC")
-
+    async def create_leaderboard(self, ctx, data, title):
         embed = discord.Embed(
             color = discord.Color.yellow(),
-            title = ":fire: __All-time leaderboard__ :fire:"
+            title = f":fire: {title} :fire:"
         )
-
-        data = cursor.fetchall()
-        for i, (user_id, all_time) in enumerate(data, start=1): # add users to embed
-            member = ctx.guild.get_member(user_id)
-            name = member.display_name if member else f"Unknown User ({user_id})"
-            embed.add_field(name=f"Top {i}: {name}", value=f"{all_time//3600} hours and {all_time%3600//60} minutes", inline=False)            
-            if user_id == ctx.author.id:
-                user_position = i
-
+        for user, (id, study_time) in enumerate(data, start=1):
+            member = ctx.guild.get_member(id)
+            name = member.display_name if member else f"Unknown User ({id})"
+            embed.add_field(name=f"Top {user}: {name}", value=self.format_time(study_time), inline=False)
+            if id == ctx.author.id:
+                user_position = user
         user = ctx.guild.get_member(ctx.author.id)
         embed.set_thumbnail(url=user.avatar.url)
-        embed.set_footer(text = f"Your position: #{user_position}")
+        embed.set_footer(text=f"Your position: #{user_position}")
 
-        await ctx.send(embed = embed)
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(description="All-time leaderboard")  # see all-time leaderboard
+    async def rank(self, ctx):
+        database, cursor = self.connect_database()
+        cursor.execute("SELECT user_id, all_time FROM time_database ORDER BY all_time DESC")
+        data = cursor.fetchall()
+        await self.create_leaderboard(ctx, data, "All-time leaderboard")
         self.disconnect_database(database)
 
     @commands.hybrid_command(description="Weekly leaderboard")  # see weekly leaderboard
-    async def time(self, ctx):
+    async def leaderboard(self, ctx):
         database, cursor = self.connect_database()
         cursor.execute("SELECT user_id, weekly_time FROM time_database WHERE weekly_time > 0 ORDER BY weekly_time DESC")
-        
-        embed = discord.Embed(
-            color=discord.Color.yellow(),
-            title=":fire: __Weekly leaderboard__ :fire:"
-        )
-
         data = cursor.fetchall()
         if not data:
-            await ctx.send(f"No one studied this week")
+            await ctx.send("No one studied this week")
+            self.disconnect_database(database)
             return
-        for i, (user_id, weekly_time) in enumerate(data, start=1): # add users to embed
-            member = ctx.guild.get_member(user_id)
-            name = member.display_name if member else f"Unknown User ({user_id})"
-            embed.add_field(name=f"Top {i}: {name}", value=f"{weekly_time//3600} hours and {weekly_time%3600//60} minutes", inline=False)            
-            if user_id == ctx.author.id:
-                user_position = i
-
-        user = ctx.guild.get_member(ctx.author.id)
-        embed.set_thumbnail(url=user.avatar.url)
-        embed.set_footer(text = f"Your position: #{user_position}")
-
-        await ctx.send(embed = embed)
+        await self.create_leaderboard(ctx, data, "Weekly leaderboard")
         self.disconnect_database(database)
+
+
+    async def create_dm(self, member, role):
+        dm = discord.Embed(
+            color=discord.Color.red(),
+            title=f"Congratulations {member.display_name}!",
+            description=f"Based on your performance last week, we've assigned you  :fire: **{role}** :fire: role. Keep up the great work!"
+        )
+
+        await member.send(embed=dm)
+    
+    async def create_summarize(self, ctx, data, lists):
+        embed = discord.Embed(
+            color=discord.Color.red(),
+            title=":fire: Grinder of the week :fire:"
+        )
+        top_user_id, top_weekly_time = data[0]
+        top_member = ctx.guild.get_member(top_user_id)
+        embed.set_thumbnail(url=top_member.avatar.url)
+        embed.set_footer(text=f"-from {self.sylvie.user} with love-")
+        if lists[0]:
+            embed.add_field(name="Scholars", value="\n".join(lists[0]), inline=False)
+        if lists[1]:
+            embed.add_field(name="Students", value="\n".join(lists[1]), inline=False)
+        if lists[2]:
+            embed.add_field(name='"at least you participated"', value="\n".join(lists[2]), inline=False)
+
+        await ctx.send(embed=embed)
 
     @commands.hybrid_command(description="[Pha only] Weekly summarize")
     @checkPha()
     async def summarize(self, ctx):
         database, cursor = self.connect_database()
         cursor.execute("SELECT user_id, weekly_time FROM time_database WHERE weekly_time > 0 ORDER BY weekly_time DESC")
-
-        embed = discord.Embed(
-            color=discord.Color.red(),
-            title=":fire: __Last week summarize__ :fire:"
-        )
-
         data = cursor.fetchall()
         if not data:
             await ctx.send(f"No one studied this week")
+            self.disconnect_database(database)
             return
-        for i, (user_id, weekly_time) in enumerate(data, start=1): # add users to embed
-            member = ctx.guild.get_member(user_id)
-            name = member.display_name if member else f"Unknown User ({user_id})"
-            embed.add_field(name=f"Top {i}: {name}", value=f"{weekly_time // 60} minutes", inline=False)
 
-        top_user_id, top_weekly_time = data[0] # add 1's avatar to embed
-        top_member = ctx.guild.get_member(top_user_id)
-        embed.set_thumbnail(url=top_member.avatar.url)
-        embed.set_footer(text = f"-from {self.sylvie.user} with love-")
+        highrole_list, midrole_list, lowrole_list = [], [], [] # place holders
+        for user, (id, study_time) in enumerate(data, start=1):
+            member = ctx.guild.get_member(id)
+            name = member.display_name if member else f"Unknown User ({id})"
+            if study_time >= 70 * 3600:
+                role = "Scholar"
+                highrole_list.append(f"- {name}: {self.format_time(study_time)}")
+                await self.create_dm(member, role)
+            elif study_time >= 10 * 3600:
+                role = "Student"
+                midrole_list.append(f"- {name}: {self.format_time(study_time)}")
+                await self.create_dm(member, role)
+            else:
+                lowrole_list.append(f"- {name}: {self.format_time(study_time)}")
+        lists = [highrole_list, midrole_list, lowrole_list]
 
+        await self.create_summarize(ctx, data, lists)
         tasksManager(self.sylvie).cleartodolist()
         cursor.execute("UPDATE time_database SET weekly_time = 0")
-        await ctx.send(embed = embed)
+
         self.disconnect_database(database)
 
 
