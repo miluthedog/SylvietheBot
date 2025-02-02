@@ -4,33 +4,44 @@ import sqlite3 as sql
 import time
 import config
 from module.checkpermission import checkPha
-from module.tasksManager import cleartodolist
+from module.tasksManager import tasksManager
 
 
-
-database = sql.connect("./module/studytime.db")
-cursor = database.cursor()
-database.execute("CREATE TABLE IF NOT EXISTS time_database (user_id, weekly_time, all_time)")
 
 class studyTracker(commands.Cog):
     def __init__(self, sylvie):
         self.sylvie = sylvie
-        self.start_time = {}
         
+        self.start_time = {}
         self.update_time.start()
 
-    @tasks.loop(minutes=1)
+        self.create_database()
+
+    def connect_database(self):
+        database = sql.connect("./module/studytime.db")
+        cursor = database.cursor()
+        return database,cursor
+    
+    def disconnect_database(self, database):
+        database.commit()
+        database.close()
+    
+    def create_database(self):
+        database, cursor = self.connect_database()
+        cursor.execute("CREATE TABLE IF NOT EXISTS time_database (user_id, weekly_time, all_time)")
+        self.disconnect_database(database)
+
+
+    @tasks.loop(minutes=1) # every minute
     async def update_time(self):  # update time to database
         voice = self.sylvie.get_channel(config.ID.voice)
         if not voice:
             return
 
-        database = sql.connect("./module/studytime.db")
-        cursor = database.cursor()
+        database, cursor = self.connect_database()
         for member in voice.members:
             cursor.execute("SELECT * FROM time_database WHERE user_id = ?", (member.id,))
             data = cursor.fetchone()
-            
             if data:
                 updated_time = data[1] + 60
                 all_time = data[2] + 60
@@ -38,9 +49,7 @@ class studyTracker(commands.Cog):
             else: 
                 cursor.execute("INSERT INTO time_database (user_id, weekly_time, all_time) VALUES (?, ?, ?)", (member.id, 60, 60))
         
-        database.commit()
-        database.close()
-
+        self.disconnect_database(database)
 
     @commands.Cog.listener() # calculate study session time
     async def on_voice_state_update(self, member, before, after):
@@ -60,8 +69,7 @@ class studyTracker(commands.Cog):
 
     @commands.hybrid_command(description="All-time leaderboard") # see all-time leaderboard
     async def leaderboard(self, ctx):
-        database = sql.connect("./module/studytime.db")
-        cursor = database.cursor()
+        database, cursor = self.connect_database()
         cursor.execute("SELECT user_id, all_time FROM time_database ORDER BY all_time DESC")
 
         embed = discord.Embed(
@@ -82,13 +90,11 @@ class studyTracker(commands.Cog):
         embed.set_footer(text = f"Your position: #{user_position}")
 
         await ctx.send(embed = embed)
-        database.close()
-
+        self.disconnect_database(database)
 
     @commands.hybrid_command(description="Weekly leaderboard")  # see weekly leaderboard
     async def time(self, ctx):
-        database = sql.connect("./module/studytime.db")
-        cursor = database.cursor()
+        database, cursor = self.connect_database()
         cursor.execute("SELECT user_id, weekly_time FROM time_database WHERE weekly_time > 0 ORDER BY weekly_time DESC")
         
         embed = discord.Embed(
@@ -112,19 +118,17 @@ class studyTracker(commands.Cog):
         embed.set_footer(text = f"Your position: #{user_position}")
 
         await ctx.send(embed = embed)
-        database.close()
-
+        self.disconnect_database(database)
 
     @commands.hybrid_command(description="[Pha only] Weekly summarize")
     @checkPha()
     async def summarize(self, ctx):
-        database = sql.connect("./module/studytime.db")
-        cursor = database.cursor()
+        database, cursor = self.connect_database()
         cursor.execute("SELECT user_id, weekly_time FROM time_database WHERE weekly_time > 0 ORDER BY weekly_time DESC")
 
         embed = discord.Embed(
             color=discord.Color.red(),
-            title=":fire: __Weekly leaderboard__ :fire:"
+            title=":fire: __Last week summarize__ :fire:"
         )
 
         data = cursor.fetchall()
@@ -141,11 +145,10 @@ class studyTracker(commands.Cog):
         embed.set_thumbnail(url=top_member.avatar.url)
         embed.set_footer(text = f"-from {self.sylvie.user} with love-")
 
-        cleartodolist()
+        tasksManager(self.sylvie).cleartodolist()
         cursor.execute("UPDATE time_database SET weekly_time = 0")
         await ctx.send(embed = embed)
-        database.commit()
-        database.close()
+        self.disconnect_database(database)
 
 
 
