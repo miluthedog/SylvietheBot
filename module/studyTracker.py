@@ -109,28 +109,27 @@ class studyTracker(commands.Cog):
         self.disconnect_database(database)
 
 
-    async def create_dm(self, member, role):
+    async def create_dm(self, member):
         dm = discord.Embed(
             color=discord.Color.red(),
             title=f"Congratulations {member.display_name}!",
-            description=f"Based on your performance last week, we've assigned you  :fire: **{role}** :fire: role. Keep up the great work!"
-        )
+            description = f"I'm {self.sylvie.user}, representing Pha Cord. We really appreciate your contribution to our growth. Keep up the fire!")
 
         await member.send(embed=dm)
     
     async def create_summarize(self, ctx, data, lists):
         embed = discord.Embed(
             color=discord.Color.red(),
-            title=":fire: Grinder of the week :fire:"
-        )
-        top_user_id, top_weekly_time = data[0]
+            title=":fire: Grinders of the week :fire:")
+
+        top_user_id, _ = data[0]
         top_member = ctx.guild.get_member(top_user_id)
         embed.set_thumbnail(url=top_member.avatar.url)
         embed.set_footer(text=f"-from {self.sylvie.user} with love-")
         if lists[0]:
-            embed.add_field(name="Scholars", value="\n".join(lists[0]), inline=False)
+            embed.add_field(name="Scholar-tier grinders", value="\n".join(lists[0]), inline=False)
         if lists[1]:
-            embed.add_field(name="Students", value="\n".join(lists[1]), inline=False)
+            embed.add_field(name="Student-tier grinders", value="\n".join(lists[1]), inline=False)
         if lists[2]:
             embed.add_field(name='"at least you participated"', value="\n".join(lists[2]), inline=False)
 
@@ -148,17 +147,15 @@ class studyTracker(commands.Cog):
             return
 
         highrole_list, midrole_list, lowrole_list = [], [], [] # place holders
-        for user, (id, study_time) in enumerate(data, start=1):
+        for _, (id, study_time) in enumerate(data, start=1):
             member = ctx.guild.get_member(id)
             name = member.display_name if member else f"Unknown User ({id})"
             if study_time >= 70 * 3600:
-                role = "Scholar"
                 highrole_list.append(f"- {name}: {self.format_time(study_time)}")
-                await self.create_dm(member, role)
+                await self.create_dm(member)
             elif study_time >= 10 * 3600:
-                role = "Student"
                 midrole_list.append(f"- {name}: {self.format_time(study_time)}")
-                await self.create_dm(member, role)
+                await self.create_dm(member)
             else:
                 lowrole_list.append(f"- {name}: {self.format_time(study_time)}")
         lists = [highrole_list, midrole_list, lowrole_list]
