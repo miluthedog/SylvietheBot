@@ -11,10 +11,8 @@ from module.tasksManager import tasksManager
 class studyTracker(commands.Cog):
     def __init__(self, sylvie):
         self.sylvie = sylvie
-        
         self.start_time = {}
         self.update_time.start()
-
         self.create_database()
 
     def connect_database(self):
@@ -31,13 +29,13 @@ class studyTracker(commands.Cog):
         cursor.execute("CREATE TABLE IF NOT EXISTS time_database (user_id, weekly_time, all_time)")
         self.disconnect_database(database)
     
-    
     def format_time(self, time):
         return f"{time // 3600} hours and {time % 3600 // 60} minutes"
 
 
+
     @tasks.loop(minutes=1) # every minute
-    async def update_time(self):  # update time to database
+    async def update_time(self):  # Update time to database
         voice = self.sylvie.get_channel(config.ID.voice)
         if not voice:
             return
@@ -55,7 +53,7 @@ class studyTracker(commands.Cog):
         
         self.disconnect_database(database)
 
-    @commands.Cog.listener() # calculate study session time
+    @commands.Cog.listener() # Calculate study session
     async def on_voice_state_update(self, member, before, after):
         current_time = time.time()
         main = self.sylvie.get_channel(config.ID.main)
@@ -71,32 +69,16 @@ class studyTracker(commands.Cog):
                 await main.send(f"{member.display_name} just grinded for {self.format_time(session)} straight")
 
 
-    async def create_leaderboard(self, ctx, data, title):
-        embed = discord.Embed(
-            color = discord.Color.yellow(),
-            title = f":fire: {title} :fire:"
-        )
-        for user, (id, study_time) in enumerate(data, start=1):
-            member = ctx.guild.get_member(id)
-            name = member.display_name if member else f"Unknown User ({id})"
-            embed.add_field(name=f"Top {user}: {name}", value=self.format_time(study_time), inline=False)
-            if id == ctx.author.id:
-                user_position = user
-        user = ctx.guild.get_member(ctx.author.id)
-        embed.set_thumbnail(url=user.avatar.url)
-        embed.set_footer(text=f"Your position: #{user_position}")
 
-        await ctx.send(embed=embed)
-
-    @commands.hybrid_command(description="All-time leaderboard")  # see all-time leaderboard
-    async def rank(self, ctx):
+    @commands.hybrid_command(description="All-time leaderboard")  # Send all-time leaderboard
+    async def alltime(self, ctx):
         database, cursor = self.connect_database()
         cursor.execute("SELECT user_id, all_time FROM time_database ORDER BY all_time DESC")
         data = cursor.fetchall()
         await self.create_leaderboard(ctx, data, "All-time leaderboard")
         self.disconnect_database(database)
 
-    @commands.hybrid_command(description="Weekly leaderboard")  # see weekly leaderboard
+    @commands.hybrid_command(description="Weekly leaderboard")  # Send weekly leaderboard
     async def leaderboard(self, ctx):
         database, cursor = self.connect_database()
         cursor.execute("SELECT user_id, weekly_time FROM time_database WHERE weekly_time > 0 ORDER BY weekly_time DESC")
@@ -108,16 +90,70 @@ class studyTracker(commands.Cog):
         await self.create_leaderboard(ctx, data, "Weekly leaderboard")
         self.disconnect_database(database)
 
+    async def create_leaderboard(self, ctx, data, title): # Send leaderboard: send embed
+        embed = discord.Embed(
+            color = discord.Color.yellow(),
+            title = f":fire: {title} :fire:"
+        )
+        for user, (id, study_time) in enumerate(data, start=1):
+            member = ctx.guild.get_member(id)
+            name = member.display_name if member else f"Unknown User ({id})"
+            embed.add_field(name=f"Top {user}: {name}", value=self.format_time(study_time), inline=False)
+            if id == ctx.author.id:
+                user_position = user
+            else:
+                user_position = "NaN"
+        user = ctx.guild.get_member(ctx.author.id)
+        embed.set_thumbnail(url=user.avatar.url)
+        embed.set_footer(text=f"Your position: #{user_position}")
 
-    async def create_dm(self, member):
+        await ctx.send(embed=embed)
+
+
+
+    @commands.hybrid_command(description="[Pha only] Weekly summarize") # Summarize (Remove weekly time and todolists)
+    @checkPha()
+    async def summarize(self, ctx):
+        database, cursor = self.connect_database()
+        cursor.execute("SELECT user_id, weekly_time FROM time_database WHERE weekly_time > 0 ORDER BY weekly_time DESC")
+        data = cursor.fetchall()
+        if not data:
+            await ctx.send(f"No one studied this week")
+            self.disconnect_database(database)
+            return
+
+        members, highrole_list, midrole_list, lowrole_list = [], [], [], [] # place holders
+        for _, (id, study_time) in enumerate(data, start=1):
+            member = ctx.guild.get_member(id)
+            name = member.display_name if member else f"Unknown User ({id})"
+            if study_time >= 70 * 3600:
+                highrole_list.append(f"- {name}: {self.format_time(study_time)}")
+                members.append(member)
+            elif study_time >= 10 * 3600:
+                midrole_list.append(f"- {name}: {self.format_time(study_time)}")
+                members.append(member)
+            else:
+                lowrole_list.append(f"- {name}: {self.format_time(study_time)}")
+
+        lists = [highrole_list, midrole_list, lowrole_list]
+        await self.create_summarize(ctx, data, lists)
+
+        for member in members:
+            await self.create_dm(member)
+
+        tasksManager(self.sylvie).cleartodolist()
+        cursor.execute("UPDATE time_database SET weekly_time = 0")
+        self.disconnect_database(database)
+
+    async def create_dm(self, member): # Summarize: send dm to all users
         dm = discord.Embed(
             color=discord.Color.red(),
             title=f"Congratulations {member.display_name}!",
             description = f"I'm {self.sylvie.user}, representing Pha Cord. We really appreciate your contribution to our growth. Keep up the fire!")
 
         await member.send(embed=dm)
-    
-    async def create_summarize(self, ctx, data, lists):
+
+    async def create_summarize(self, ctx, data, lists): # Summarize: send server embed
         embed = discord.Embed(
             color=discord.Color.red(),
             title=":fire: Grinders of the week :fire:")
@@ -134,37 +170,6 @@ class studyTracker(commands.Cog):
             embed.add_field(name='"at least you participated"', value="\n".join(lists[2]), inline=False)
 
         await ctx.send(embed=embed)
-
-    @commands.hybrid_command(description="[Pha only] Weekly summarize")
-    @checkPha()
-    async def summarize(self, ctx):
-        database, cursor = self.connect_database()
-        cursor.execute("SELECT user_id, weekly_time FROM time_database WHERE weekly_time > 0 ORDER BY weekly_time DESC")
-        data = cursor.fetchall()
-        if not data:
-            await ctx.send(f"No one studied this week")
-            self.disconnect_database(database)
-            return
-
-        highrole_list, midrole_list, lowrole_list = [], [], [] # place holders
-        for _, (id, study_time) in enumerate(data, start=1):
-            member = ctx.guild.get_member(id)
-            name = member.display_name if member else f"Unknown User ({id})"
-            if study_time >= 70 * 3600:
-                highrole_list.append(f"- {name}: {self.format_time(study_time)}")
-                await self.create_dm(member)
-            elif study_time >= 10 * 3600:
-                midrole_list.append(f"- {name}: {self.format_time(study_time)}")
-                await self.create_dm(member)
-            else:
-                lowrole_list.append(f"- {name}: {self.format_time(study_time)}")
-        lists = [highrole_list, midrole_list, lowrole_list]
-
-        await self.create_summarize(ctx, data, lists)
-        tasksManager(self.sylvie).cleartodolist()
-        cursor.execute("UPDATE time_database SET weekly_time = 0")
-
-        self.disconnect_database(database)
 
 
 
