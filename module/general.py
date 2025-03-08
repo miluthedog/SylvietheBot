@@ -3,6 +3,13 @@ import config
 
 
 
+def checkPha():
+    def predicate(ctx):
+        return ctx.author.id in config.ID.Pha
+    return commands.check(predicate)
+
+
+
 class autorespond(commands.Cog):    
     def __init__(self, sylvie):
         self.sylvie = sylvie

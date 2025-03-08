@@ -1,7 +1,7 @@
 import secret
 
 moduleList = [
-"module.autorespond",
+"module.general",
 "module.StudyTracker",
 "module.TasksManager"
 ]

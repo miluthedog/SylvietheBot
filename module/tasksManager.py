@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import sqlite3 as sql
-from module.checkpermission import checkPha
+from module.general import checkPha
 
 
 

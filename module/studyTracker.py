@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 import sqlite3 as sql
 import time
 import config
-from module.checkpermission import checkPha
+from module.general import checkPha
 from module.TasksManager import TasksManager
 
 
