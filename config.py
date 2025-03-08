@@ -2,8 +2,8 @@ import secret
 
 moduleList = [
 "module.autorespond",
-"module.studyTracker",
-"module.tasksManager"
+"module.StudyTracker",
+"module.TasksManager"
 ]
 
 class ID:

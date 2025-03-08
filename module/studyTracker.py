@@ -4,11 +4,11 @@ import sqlite3 as sql
 import time
 import config
 from module.checkpermission import checkPha
-from module.tasksManager import tasksManager
+from module.TasksManager import TasksManager
 
 
 
-class studyTracker(commands.Cog):
+class StudyTracker(commands.Cog):
     def __init__(self, sylvie):
         self.sylvie = sylvie
         self.start_time = {}
@@ -141,7 +141,7 @@ class studyTracker(commands.Cog):
         for member in members:
             await self.create_dm(member)
 
-        tasksManager(self.sylvie).cleartodolist()
+        TasksManager(self.sylvie).cleartodolist()
         cursor.execute("UPDATE time_database SET weekly_time = 0")
         self.disconnect_database(database)
 
@@ -174,4 +174,4 @@ class studyTracker(commands.Cog):
 
 
 async def setup(sylvie):
-    await sylvie.add_cog(studyTracker(sylvie))
+    await sylvie.add_cog(StudyTracker(sylvie))

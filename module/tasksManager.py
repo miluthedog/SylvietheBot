@@ -5,7 +5,7 @@ from module.checkpermission import checkPha
 
 
 
-class tasksManager(commands.Cog):
+class TasksManager(commands.Cog):
     def __init__(self, sylvie):
         self.sylvie = sylvie
         self.create_database()
@@ -86,5 +86,5 @@ class tasksManager(commands.Cog):
 
 
 async def setup(sylvie):
-    await sylvie.add_cog(tasksManager(sylvie))
+    await sylvie.add_cog(TasksManager(sylvie))
 
