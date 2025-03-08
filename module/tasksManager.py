@@ -42,7 +42,7 @@ class TasksManager(commands.Cog):
     @commands.hybrid_command(description="Remove your todolist") # Remove tasks
     async def remove(self, ctx):
         database, cursor = self.connect_database()
-        cursor.execute("DELETE FROM todolist WHERE user_id = ?", (ctx.author.id))
+        cursor.execute("DELETE FROM todolist WHERE user_id = ?", (ctx.author.id,))
         self.disconnect_database(database)
 
         await ctx.send(f"Cleared {ctx.author.display_name}'s todolist")
