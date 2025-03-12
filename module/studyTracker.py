@@ -93,16 +93,15 @@ class StudyTracker(commands.Cog):
     async def create_leaderboard(self, ctx, data, title): # Send leaderboard: send embed
         embed = discord.Embed(
             color = discord.Color.yellow(),
-            title = f":fire: {title} :fire:"
-        )
+            title = f":fire: {title} :fire:")
+
+        user_position = "NaN"
         for user, (id, study_time) in enumerate(data, start=1):
             member = ctx.guild.get_member(id)
             name = member.display_name if member else f"Unknown User ({id})"
             embed.add_field(name=f"Top {user}: {name}", value=self.format_time(study_time), inline=False)
             if id == ctx.author.id:
                 user_position = user
-            else:
-                user_position = "NaN"
         user = ctx.guild.get_member(ctx.author.id)
         embed.set_thumbnail(url=user.avatar.url)
         embed.set_footer(text=f"Your position: #{user_position}")
