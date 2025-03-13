@@ -6,8 +6,8 @@ secret = dotenv_values(".env")
 
 moduleList = [
     "module.general",
-    "module.StudyTracker",
-    "module.TasksManager"
+    "module.studyTracker",
+    "module.tasksManager"
 ]
 
 
@@ -22,6 +22,6 @@ class ID:
 
 
 class token:
-    discord = secret.DISCORDTOKEN
-    hugging = secret.HUGGINGTOKEN
-    together = secret.TOGETHERTOKEN
+    discord = secret.get("DISCORDTOKEN")
+    hugging = secret.get("HUGGINGTOKEN")
+    together = secret.get("TOGETHERTOKEN")
