@@ -1,8 +1,11 @@
+from os import environ
 from dotenv import load_dotenv, dotenv_values
 
 load_dotenv()
 
-secret = dotenv_values(".env")
+env_vars = dotenv_values(".env")
+
+secret = {**env_vars, **environ}
 
 moduleList = [
     "module.general",
