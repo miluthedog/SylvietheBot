@@ -1,8 +1,6 @@
 FROM python:3.9.21-alpine3.21
 
-USER sylvie
-
-WORKDIR /app
+WORKDIR /usr/app
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
@@ -17,6 +15,6 @@ ENV DISCORDTOKEN=${DISCORDTOKEN}
 ENV HUGGINGTOKEN=${HUGGINGTOKEN}
 ENV TOGETHERTOKEN=${TOGETHERTOKEN}
 
-VOLUME [ "/app/db" ]
+VOLUME [ "./db" ]
 
 CMD [ "python", "main.py" ]
