@@ -2,12 +2,10 @@ from discord.ext import commands
 import config
 
 
-
 def checkPha():
     def predicate(ctx):
         return ctx.author.id in config.ID.administrator
     return commands.check(predicate)
-
 
 
 class autorespond(commands.Cog):    
@@ -31,7 +29,6 @@ class autorespond(commands.Cog):
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandNotFound):
             await ctx.send(f"{self.sylvie.user} love you")
-
 
 
 async def setup(sylvie):
