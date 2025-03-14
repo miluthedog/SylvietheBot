@@ -2,7 +2,7 @@
 ### Join and Study with Me
 - https://discord.gg/CrjqZ3ARht
 ### Set Up the Bot for Your Own Server  
-- Replace the server ID (main text channel and voice channel) in `config.py`.
+- Replace the server ID (main text channel and voice channel) and administrator's ID in `config.py`.
 - Make a copy of `.env.example` and rename it to `.env`
 - Fill in the blanks (your Discord bot token and other tokens)
 - Run `main.py`.
@@ -13,5 +13,4 @@
 ### Functions
 - Track study time and display leaderboards.
 - Create to-do lists.
-- Integrated with DeepSeek-V3.
-- (There are more features, but they are designed specifically for me. You can modify them as needed.)
+
