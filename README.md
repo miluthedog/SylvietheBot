@@ -3,7 +3,8 @@
 - https://discord.gg/CrjqZ3ARht
 ### Set Up the Bot for Your Own Server  
 - Replace the server ID (main text channel and voice channel) in `config.py`.
-- Replace the APIs (Discord bot and LLM model) in `config.py`.
+- Make a copy of `.env.example` and rename it to `.env`
+- Fill in the blanks (your Discord bot token and other tokens)
 - Run `main.py`.
 ### Programming the Bot Yourself  
 - This is my pet project, so it's frequently updated (and the code is functional).

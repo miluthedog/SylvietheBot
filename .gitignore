@@ -3,3 +3,5 @@
 *\.db
 
 secret.py
+.venv\*
+.env
