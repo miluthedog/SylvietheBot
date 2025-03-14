@@ -5,7 +5,7 @@ import config
 
 def checkPha():
     def predicate(ctx):
-        return ctx.author.id in config.ID.Pha
+        return ctx.author.id in config.ID.administrator
     return commands.check(predicate)
 
 
