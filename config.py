@@ -7,12 +7,6 @@ env_vars = dotenv_values(".env")
 
 secret = {**env_vars, **environ}
 
-moduleList = [
-    "module.general",
-    "module.studyTracker",
-    "module.tasksManager"
-]
-
 
 class ID:
     main = 1242439205406244954
