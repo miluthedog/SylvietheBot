@@ -13,5 +13,4 @@
 ### Functions
 - Track study time and display leaderboards.
 - Create to-do lists.
-- Integrated with DeepSeek-V3.
-- (There are more features, but they are designed specifically for me. You can modify them as needed.)
+

@@ -26,5 +26,4 @@ class ID:
 
 class token:
     discord = secret.get("DISCORDTOKEN")
-    hugging = secret.get("HUGGINGTOKEN")
-    together = secret.get("TOGETHERTOKEN")
+
