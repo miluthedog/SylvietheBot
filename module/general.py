@@ -2,9 +2,9 @@ from discord.ext import commands
 import config
 
 
-def checkPha():
+def checkPermission():
     def predicate(ctx):
-        return ctx.author.id in config.ID.administrator
+        return ctx.guild.get_role(config.ID.admin_role) in ctx.author.roles
     return commands.check(predicate)
 
 
@@ -20,9 +20,13 @@ class autorespond(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        main = self.sylvie.get_channel(config.ID.main)
-        await main.send(f'Welcome {member} to the server')
-        await main.send(f"I'm {self.sylvie.user}, read https://discord.com/channels/1116323597590474845/1135394985777315971 for information")
+        main = self.sylvie.get_channel(config.ID.main_channel)
+        await main.send(f'Welcome {member} to our study server!')
+        role = member.guild.get_role(config.ID.default_role)
+        if role:
+            await member.add_roles(role)
+            await main.send(f"You're {role.name} now. Study hard to get better!")
+        await main.send(f"I'm {self.sylvie.user}. Read <#{config.ID.rules_channel}> for details.")
 
 
     @commands.Cog.listener()

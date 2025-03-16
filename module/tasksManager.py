@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import sqlite3 as sql
-from module.general import checkPha
+from module.general import checkPermission
 
 
 class TasksManager(commands.Cog):
@@ -79,7 +79,7 @@ class TasksManager(commands.Cog):
 
     # Clear database
     @commands.hybrid_command(description="[Pha only] Remove all tasks in database")
-    @checkPha()
+    @checkPermission()
     async def clear(self, ctx):
         self.cleartodolist()
         await ctx.send(f"Removed all tasks in database")
