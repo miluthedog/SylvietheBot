@@ -2,6 +2,8 @@
 *\.bat
 *\.db
 
-secret.py
+.cursorrules
+.cursorignore
+
 .venv\*
 .env
