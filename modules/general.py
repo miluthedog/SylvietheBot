@@ -15,7 +15,7 @@ class autorespond(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await self.sylvie.tree.sync()
-        print (f"{self.sylvie.user} is now ready, master!")
+        print (f"Sylvie v1.0.0: {self.sylvie.user} is now ready, master!")
 
 
     @commands.Cog.listener()

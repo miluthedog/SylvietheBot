@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import sqlite3 as sql
-from module.general import checkPermission
+from modules.general import checkPermission
 
 
 class TasksManager(commands.Cog):

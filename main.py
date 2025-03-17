@@ -8,13 +8,13 @@ import os
 sylvie = commands.Bot(command_prefix="Sylvie ", intents=discord.Intents.all())
 
 BASE_DIR = pathlib.Path(__file__).parent
-MODULE_DIR = BASE_DIR / "module"
+MODULE_DIR = BASE_DIR / "modules"
 
 
 async def loadModules():
     for file in MODULE_DIR.glob("*.py"):
         if file.name != "__init__.py":
-            await sylvie.load_extension(f"module.{file.name[:-3]}")
+            await sylvie.load_extension(f"modules.{file.name[:-3]}")
 
 
 async def SylvieOS():

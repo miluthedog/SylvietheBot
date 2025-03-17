@@ -3,8 +3,8 @@ from discord.ext import commands, tasks
 import sqlite3 as sql
 import time
 import config
-from module.general import checkPermission
-from module.tasksManager import TasksManager
+from modules.general import checkPermission
+from modules.tasksManager import TasksManager
 
 
 class StudyTracker(commands.Cog):
