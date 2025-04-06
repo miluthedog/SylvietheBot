@@ -70,7 +70,6 @@ class StudyTracker(commands.Cog):
                 await main.send(f"{member.display_name} just grinded for {self.format_time(session)} straight")
 
     # Send all-time leaderboard
-
     @commands.hybrid_command(description="All-time leaderboard")
     async def alltime(self, ctx):
         database, cursor = self.connect_database()
