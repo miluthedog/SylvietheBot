@@ -2,8 +2,5 @@
 *\.bat
 *\.db
 
-.cursorrules
-.cursorignore
-
 .venv\*
 .env

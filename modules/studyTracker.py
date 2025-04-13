@@ -97,8 +97,7 @@ class StudyTracker(commands.Cog):
     async def create_leaderboard(self, ctx, data, title):
         embed = discord.Embed(
             color = discord.Color.yellow(),
-            title = f":fire: {title} :fire:"
-        )
+            title = f":fire: {title} :fire:")
         user_position = "NaN"
         for user, (id, study_time) in enumerate(data, start=1):
             member = ctx.guild.get_member(id)
@@ -131,16 +130,13 @@ class StudyTracker(commands.Cog):
             member = ctx.guild.get_member(id)
             name = member.display_name if member else f"Unknown User ({id})"
             if study_time >= 70 * 3600:
-                highrole_list.append(
-                    f"- {name}: {self.format_time(study_time)}")
+                highrole_list.append(f"- {name}: {self.format_time(study_time)}")
                 members.append(member)
             elif study_time >= 10 * 3600:
-                midrole_list.append(
-                    f"- {name}: {self.format_time(study_time)}")
+                midrole_list.append(f"- {name}: {self.format_time(study_time)}")
                 members.append(member)
             else:
-                lowrole_list.append(
-                    f"- {name}: {self.format_time(study_time)}")
+                lowrole_list.append(f"- {name}: {self.format_time(study_time)}")
 
         lists = [highrole_list, midrole_list, lowrole_list]
         await self.create_summarize(ctx, data, lists)
