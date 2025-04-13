@@ -102,12 +102,12 @@ class StudyTracker(commands.Cog):
         for user, (id, study_time) in enumerate(data, start=1):
             member = ctx.guild.get_member(id)
             name = member.display_name if member else f"Unknown User ({id})"
-            embed.add_field(name=f"Top {user}: {name}", value=self.format_time(
-                study_time), inline=False)
+            embed.add_field(name=f"Top {user}: {name}", value=self.format_time(study_time), inline=False)
             if id == ctx.author.id:
                 user_position = user
         user = ctx.guild.get_member(ctx.author.id)
-        embed.set_thumbnail(url=user.avatar.url)
+        avatar_url = user.avatar.url if user.avatar else user.default_avatar.url
+        embed.set_thumbnail(url=avatar_url)
         embed.set_footer(text=f"Your position: #{user_position}")
 
         await ctx.send(embed=embed)
@@ -164,17 +164,15 @@ class StudyTracker(commands.Cog):
 
         top_user_id, _ = data[0]
         top_member = ctx.guild.get_member(top_user_id)
-        embed.set_thumbnail(url=top_member.avatar.url)
+        avatar_url = top_member.avatar.url if top_member.avatar else top_member.default_avatar.url
+        embed.set_thumbnail(url=avatar_url)
         embed.set_footer(text=f"-from {self.sylvie.user} with love-")
         if lists[0]:
-            embed.add_field(name="Scholar-tier grinders",
-                            value="\n".join(lists[0]), inline=False)
+            embed.add_field(name="Scholar-tier grinders", value="\n".join(lists[0]), inline=False)
         if lists[1]:
-            embed.add_field(name="Student-tier grinders",
-                            value="\n".join(lists[1]), inline=False)
+            embed.add_field(name="Student-tier grinders", value="\n".join(lists[1]), inline=False)
         if lists[2]:
-            embed.add_field(name='"at least you participated"',
-                            value="\n".join(lists[2]), inline=False)
+            embed.add_field(name='"at least you participated"', value="\n".join(lists[2]), inline=False)
 
         await ctx.send(embed=embed)
 
