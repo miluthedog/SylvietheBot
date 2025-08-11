@@ -29,11 +29,5 @@ class autorespond(commands.Cog):
         await main.send(f"I'm {self.sylvie.user}. Read <#{config.ID.rules_channel}> for details.")
 
 
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
-        if isinstance(error, commands.CommandNotFound):
-            await ctx.send(f"{self.sylvie.user} love you")
-
-
 async def setup(sylvie):
     await sylvie.add_cog(autorespond(sylvie))
